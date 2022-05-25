@@ -67,7 +67,7 @@ export const ExpensesContext = createContext({
 function expensesReducer(state, action) {
   switch (action.type) {
     case "ADD":
-      const id = new Date().toString() + matchMedia.random().toString();
+      const id = new Date().toString() + Math.random().toString();
       return [{ ...action.payload, id: id }, ...state]; //in case of add dispatch, spread in old state along with action payload.
     case "UPDATE":
       const updatableExpenseIndex = state.findIndex(
@@ -79,9 +79,7 @@ function expensesReducer(state, action) {
       updatedExpenses[updatableExpenseIndex] = updatedItem;
       return updatedExpenses;
     case "DELETE":
-      return state.filter((expense) => {
-        expense.id !== action.payload;
-      });
+      return state.filter((expense) => expense.id !== action.payload);
     default:
       return state;
   }
