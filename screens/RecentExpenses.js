@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { ExpensesContext } from "../store/expenses-context";
 import { getDateMinusDays } from "../util/date";
@@ -7,6 +8,7 @@ import { fetchExpense } from "../util/http";
 
 function RecentExpenses() {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
 
   const expensesCtx = useContext(ExpensesContext);
 
@@ -15,14 +17,24 @@ function RecentExpenses() {
     async function getExpenses() {
       setIsLoading(true);
       //created getexpenses because cannot make useEffect into an async
-      const expenses = await fetchExpense();
+      try {
+        const expenses = await fetchExpense();
+        expensesCtx.setExpenses(expenses);
+      } catch (error) {
+        setError("Could not fetch Expenses!");
+      }
       setIsLoading(false);
       // setFetchedExpenses(expenses);
-      expensesCtx.setExpenses(expenses);
     }
     getExpenses();
   }, []);
 
+  function errorHandler() {
+    setError(null);
+  }
+  if (error && !isLoading) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  }
   if (isLoading) {
     return <LoadingOverlay />;
   }
